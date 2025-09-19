@@ -145,21 +145,23 @@ class MemoramaState extends State<Memorama> {
       child: Center(
         child: AspectRatio(
           aspectRatio: col / ren,
-          child: GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: result,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: col,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () {
-                },
-                child: Container(
-                  color: Colors.grey.shade400,
-                ),
+          child: ListView.builder(
+            itemCount: ren,
+            itemBuilder: (context, rowIndex) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(col, (colIndex) {
+                  return InkWell(
+                    onTap: () {
+                    },
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      color: Colors.grey.shade400,
+                      margin: const EdgeInsets.all(4),
+                    ),
+                  );
+                }),
               );
             },
           ),
@@ -167,4 +169,6 @@ class MemoramaState extends State<Memorama> {
       ),
     );
   }
+
+
 }
