@@ -1,5 +1,32 @@
 import 'package:flutter/material.dart';
 
+const List<Color> colores24 = <Color>[
+  Color(0xFFF44336), // Red 500
+  Color(0xFFE91E63), // Pink 500
+  Color(0xFF9C27B0), // Purple 500
+  Color(0xFF673AB7), // Deep Purple 500
+  Color(0xFF3F51B5), // Indigo 500
+  Color(0xFF2196F3), // Blue 500
+  Color(0xFF03A9F4), // Light Blue 500
+  Color(0xFF00BCD4), // Cyan 500
+  Color(0xFF009688), // Teal 500
+  Color(0xFF4CAF50), // Green 500
+  Color(0xFF8BC34A), // Light Green 500
+  Color(0xFFCDDC39), // Lime 500
+  Color(0xFFFFEB3B), // Yellow 500
+  Color(0xFFFFC107), // Amber 500
+  Color(0xFFFF9800), // Orange 500
+  Color(0xFFFF5722), // Deep Orange 500
+  Color(0xFF795548), // Brown 500
+  Color(0xFF9E9E9E), // Grey 500
+  Color(0xFF607D8B), // Blue Grey 500
+  Color(0xFFD32F2F), // Red 700
+  Color(0xFF7B1FA2), // Purple 700
+  Color(0xFF512DA8), // Deep Purple 700
+  Color(0xFF1976D2), // Blue 700
+  Color(0xFF388E3C), // Green 700
+];
+
 void main() {
   runApp(const MyApp());
 }
@@ -7,116 +34,135 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
+      title: 'Memorama',
+      home: const Memorama(renI: 5, colI: 4),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class Memorama extends StatefulWidget {
+  final int renI;
+  final int colI;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const Memorama({
+    super.key,
+    required this.renI,
+    required this.colI,
+  });
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<Memorama> createState() => MemoramaState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class MemoramaState extends State<Memorama> {
+  late int ren;
+  late int col;
+  late TextEditingController contrTam;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    ren = widget.renI;
+    col = widget.colI;
+    contrTam = TextEditingController(text: '${ren}x$col');
   }
 
   @override
+  void dispose() {
+    contrTam.dispose();
+    super.dispose();
+  }
+
+  void dinamicoTam() {
+    final text = contrTam.text.trim();
+    final aux = RegExp(r'^\s*(\d+)x(\d+)\s*$').firstMatch(text);
+    if (aux == null || int.parse(aux.group(1)!) <= 0 || int.parse(aux.group(2)!) <= 0 ||
+        (int.parse(aux.group(1)!) * int.parse(aux.group(2)!)) % 2 != 0 ||
+        (int.parse(aux.group(1)!) * int.parse(aux.group(2)!)) > 48) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Formato incompleto.')),
+      );
+      return;
+    }
+    if ((int.parse(aux.group(1)!) * int.parse(aux.group(2)!)) > 48) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Exceso de Cartas.')),
+      );
+      return;
+    }
+    final r = int.parse(aux.group(1)!);
+    final c = int.parse(aux.group(2)!);
+    setState(() {
+      ren = r;
+      col = c;
+    });
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final result = ren * col;
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      appBar: AppBar(title: const Text('Memorama Sebastian de Jesus Hernandez Hernandez')),
+      body: Column(
+        children: [
+          textos(),
+          const SizedBox(height: 12),
+          Memorama1(result),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+    );
+  }
+
+  Widget textos() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: contrTam,
+            decoration: const InputDecoration(
+              labelText: 'Tamaño',
             ),
-          ],
+            onSubmitted: (_) => dinamicoTam(),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: dinamicoTam,
+          child: const Text('Aplicar'),
+        ),
+      ],
+    );
+  }
+
+  Widget Memorama1(int result) {
+    return Expanded(
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: col / ren,
+          child: GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: result,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: col,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+            ),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                },
+                child: Container(
+                  color: Colors.grey.shade400,
+                ),
+              );
+            },
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
