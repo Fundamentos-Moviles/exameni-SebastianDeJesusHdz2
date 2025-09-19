@@ -80,7 +80,8 @@ class MemoramaState extends State<Memorama> {
   void dinamicoTam() {
     final text = contrTam.text.trim();
     final aux = RegExp(r'^\s*(\d+)x(\d+)\s*$').firstMatch(text);
-    if (aux == null || int.parse(aux.group(1)!) <= 0 || int.parse(aux.group(2)!) <= 0 ||
+    if (aux == null || int.parse(aux.group(1)!) <= 0 ||
+        int.parse(aux.group(2)!) <= 0 ||
         (int.parse(aux.group(1)!) * int.parse(aux.group(2)!)) % 2 != 0 ||
         (int.parse(aux.group(1)!) * int.parse(aux.group(2)!)) > 48) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -107,7 +108,8 @@ class MemoramaState extends State<Memorama> {
   Widget build(BuildContext context) {
     final result = ren * col;
     return Scaffold(
-      appBar: AppBar(title: const Text('Memorama Sebastian de Jesus Hernandez Hernandez')),
+      appBar: AppBar(
+          title: const Text('Memorama Sebastian de Jesus Hernandez Hernandez')),
       body: Column(
         children: [
           textos(),
@@ -152,7 +154,7 @@ class MemoramaState extends State<Memorama> {
               crossAxisSpacing: 4,
             ),
             itemBuilder: (context, index) {
-              return GestureDetector(
+              return InkWell(
                 onTap: () {
                 },
                 child: Container(
