@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
 const List<Color> colores24 = <Color>[
-  Color(0xFFF44336),
-  Color(0xFFE91E63),
-  Color(0xFF9C27B0),
-  Color(0xFF673AB7),
-  Color(0xFF3F51B5),
-  Color(0xFF2196F3),
-  Color(0xFF03A9F4),
-  Color(0xFF00BCD4),
-  Color(0xFF009688),
-  Color(0xFF4CAF50),
-  Color(0xFF8BC34A),
-  Color(0xFFCDDC39),
-  Color(0xFFFFEB3B),
-  Color(0xFFFFC107),
-  Color(0xFFFF9800),
-  Color(0xFFFF5722),
-  Color(0xFF795548),
-  Color(0xFF9E9E9E),
-  Color(0xFF607D8B),
-  Color(0xFFD32F2F),
-  Color(0xFF7B1FA2),
-  Color(0xFF512DA8),
-  Color(0xFF1976D2),
-  Color(0xFF388E3C),
+  Color(0xFFFF0000),
+  Color(0xFF00FF00),
+  Color(0xFF0000FF),
+  Color(0xFFFFD700),
+  Color(0xFF8A2BE2),
+  Color(0xFF00CED1),
+  Color(0xFF8B0000),
+  Color(0xFF006400),
+  Color(0xFF00008B),
+  Color(0xFFB8860B),
+  Color(0xFFFF6347),
+  Color(0xFFADFF2F),
+  Color(0xFF7FFF00),
+  Color(0xFFFF1493),
+  Color(0xFFDC143C),
+  Color(0xFF0000CD),
+  Color(0xFF32CD32),
+  Color(0xFFFFD700),
+  Color(0xFF8B008B),
+  Color(0xFFFF4500),
+  Color(0xFF2E8B57),
+  Color(0xFFB22222),
+  Color(0xFF6495ED),
+  Color(0xFFDAA520),
 ];
 
 void main() {
@@ -62,6 +62,12 @@ class MemoramaState extends State<Memorama> {
   late int ren;
   late int col;
   late TextEditingController contrTam;
+  late List<Color> colores;
+  late List<bool> contV;
+  late List<int> auxV;
+  int numV = 0;
+  late List<bool> contE;
+  bool band = false;
 
   @override
   void initState() {
@@ -69,6 +75,11 @@ class MemoramaState extends State<Memorama> {
     ren = widget.renI;
     col = widget.colI;
     contrTam = TextEditingController(text: '${ren}x$col');
+    colores = [];
+    contV = List.generate(ren * col, (_) => false);
+    auxV = [];
+    contE = List.generate(ren * col, (_) => false);
+    genColors();
   }
 
   @override
@@ -100,9 +111,23 @@ class MemoramaState extends State<Memorama> {
     setState(() {
       ren = r;
       col = c;
+      colores.clear();
+      contV = List.generate(ren * col, (_) => false);
+      auxV = [];
+      contE = List.generate(ren * col, (_) => false);
+      genColors();
     });
   }
 
+  void genColors() {
+    List<Color> auxCD = List.from(colores24);
+    auxCD.shuffle();
+    for (int i = 0; i < ren * col / 2; i++) {
+      colores.add(auxCD[i % auxCD.length]);
+      colores.add(auxCD[i % auxCD.length]);
+    }
+    colores.shuffle();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +159,7 @@ class MemoramaState extends State<Memorama> {
         ),
         ElevatedButton(
           onPressed: dinamicoTam,
-          child: const Text('Aplicar'),
+          child: const Text('Redistribuir'),
         ),
       ],
     );
@@ -147,17 +172,51 @@ class MemoramaState extends State<Memorama> {
           aspectRatio: col / ren,
           child: ListView.builder(
             itemCount: ren,
-            itemBuilder: (context, rowIndex) {
+            itemBuilder: (context, renI) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(col, (colIndex) {
+                children: List.generate(col, (colI) {
+                  int i = renI * col + colI;
                   return InkWell(
-                    onTap: () {
+                    onTap: band
+                        ? null
+                        : () {
+                      if (contV[i] || contE[i]) return;
+                      setState(() {
+                        contV[i] = true;
+                        auxV.add(i);
+                        numV++;
+                        if (numV > 2) {
+                          contV[auxV[0]] = false;
+                          auxV.removeAt(0);
+                          numV = 1;
+                        }
+                        if (auxV.length == 2) {
+                          band = true;
+                          if (colores[auxV[0]] == colores[auxV[1]]) {
+                            contE[auxV[0]] = true;
+                            contE[auxV[1]] = true;
+                          }
+                          Future.delayed(const Duration(seconds: 1), () {
+                            setState(() {
+                              if (colores[auxV[0]] != colores[auxV[1]]) {
+                                contV[auxV[0]] = false;
+                                contV[auxV[1]] = false;
+                              }
+                              auxV.clear();
+                              numV = 0;
+                              band = false;
+                            });
+                          });
+                        }
+                      });
                     },
                     child: Container(
                       width: 60,
                       height: 60,
-                      color: Colors.grey.shade400,
+                      color: contV[i] || contE[i]
+                          ? colores[i]
+                          : Colors.grey.shade400,
                       margin: const EdgeInsets.all(4),
                     ),
                   );
