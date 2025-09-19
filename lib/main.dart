@@ -129,6 +129,38 @@ class MemoramaState extends State<Memorama> {
     colores.shuffle();
   }
 
+  bool auxFinal() {
+    return contE.every((element) => element);
+  }
+
+  void textoFinal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¡Ganaste!'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  ren = widget.renI;
+                  col = widget.colI;
+                  colores.clear();
+                  contV = List.generate(ren * col, (_) => false);
+                  auxV = [];
+                  contE = List.generate(ren * col, (_) => false);
+                  genColors();
+                });
+              },
+              child: const Text('Reiniciar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final result = ren * col;
@@ -207,6 +239,9 @@ class MemoramaState extends State<Memorama> {
                               numV = 0;
                               band = false;
                             });
+                            if (auxFinal()) {
+                              textoFinal();
+                            }
                           });
                         }
                       });
